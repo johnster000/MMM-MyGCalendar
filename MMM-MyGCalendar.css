@@ -258,6 +258,10 @@
    ══════════════════════════════════════════════ */
 
 .gcal-modal-backdrop {
+  --gcal-text:       #202124;
+  --gcal-text-muted: #5f6368;
+  --gcal-border:     #e0e0e0;
+  --gcal-hover:      #f1f3f4;
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.55);
