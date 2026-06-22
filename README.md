@@ -54,6 +54,13 @@ npm install
         url: "https://calendar.google.com/calendar/ical/work%40example.com/private-HASH/basic.ics",
         color: "#0F9D58"
       }
+    ],
+    colorRules: [
+      { keyword: "standup",        color: "#039BE5" }, // Peacock
+      { keyword: "birthday",       color: "#E91E63" }, // Pink
+      { keyword: "gym|workout",    color: "#F4511E" }, // Tangerine
+      { keyword: "holiday",        color: "#0B8043" }, // Basil
+      { keyword: "flight|travel",  color: "#F6BF26" }, // Banana
     ]
   }
 }
