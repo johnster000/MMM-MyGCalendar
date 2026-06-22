@@ -45,6 +45,10 @@ Module.register("MMM-MyGCalendar", {
   currentDayModalDate: null,
 
   start() {
+    this._compiledColorRules = (this.config.colorRules || []).map(rule => ({
+      ...rule,
+      pattern: rule.keyword instanceof RegExp ? rule.keyword : new RegExp(rule.keyword, "i")
+    }));
     this.sendSocketNotification("GCAL_INIT", this.config);
     this.scheduleMidnightRefresh();
   },
@@ -554,14 +558,10 @@ Module.register("MMM-MyGCalendar", {
     }
 
     // 2. Title-based color rules from config
-    const rules = this.config.colorRules;
-    if (rules && rules.length) {
-      for (const rule of rules) {
-        if (!rule.keyword || !rule.color) continue;
-        const pattern = rule.keyword instanceof RegExp
-          ? rule.keyword
-          : new RegExp(rule.keyword, "i");
-        if (pattern.test(ev.title)) return rule.color;
+    if (this._compiledColorRules && this._compiledColorRules.length) {
+      for (const rule of this._compiledColorRules) {
+        if (!rule.pattern || !rule.color) continue;
+        if (rule.pattern.test(ev.title)) return rule.color;
       }
     }
 
