@@ -302,16 +302,17 @@
 /* ── Modal header ──────────────────────────── */
 
 .gcal-modal-header {
-  padding: 20px 22px 18px;
+  padding: 14px 18px 12px;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 14px;
+  gap: 12px;
 }
 
 /* Day-view header uses a neutral dark gradient */
 .gcal-modal-header--day {
   background: linear-gradient(140deg, #1c1c2e 0%, #2d2d48 100%);
+  align-items: flex-start;
 }
 
 .gcal-modal-header-content {
@@ -323,11 +324,11 @@
 }
 
 .gcal-modal-title {
-  font-size: 19px;
+  font-size: 16px;
   font-weight: 700;
   color: #ffffff;
   margin: 0;
-  line-height: 1.3;
+  line-height: 1.25;
   text-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
@@ -530,4 +531,15 @@
   font-weight: 500;
   font-style: italic;
   margin-top: 4px;
+}
+
+/* ══════════════════════════════════════════════
+   Full-width mode  (config: fullWidth: true)
+   Removes border-radius and shadow so the card
+   sits flush edge-to-edge in the top_bar region.
+   ══════════════════════════════════════════════ */
+
+.gcal-wrapper.gcal-full-width .gcal-card {
+  border-radius: 0;
+  box-shadow: none;
 }

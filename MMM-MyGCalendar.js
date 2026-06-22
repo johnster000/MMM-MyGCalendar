@@ -6,6 +6,22 @@ Module.register("MMM-MyGCalendar", {
     backgroundColor: "#ffffff",
     pastWeekOpacity: 0.45,
     maxEventsPerDay: 3,
+    fullWidth: false,
+  },
+
+  // Maps Google Calendar named colors (RFC 7986 COLOR values) to hex
+  GOOGLE_COLOR_MAP: {
+    tomato:    "#D50000",
+    flamingo:  "#E67C73",
+    tangerine: "#F4511E",
+    banana:    "#F6BF26",
+    sage:      "#33B679",
+    basil:     "#0B8043",
+    peacock:   "#039BE5",
+    blueberry: "#3F51B5",
+    lavender:  "#7986CB",
+    grape:     "#8E24AA",
+    graphite:  "#616161",
   },
 
   events: [],
@@ -69,7 +85,7 @@ Module.register("MMM-MyGCalendar", {
     const { displayStart } = this.getDisplayWindow();
 
     const wrapper = document.createElement("div");
-    wrapper.className = "gcal-wrapper";
+    wrapper.className = "gcal-wrapper" + (this.config.fullWidth ? " gcal-full-width" : "");
     wrapper.style.setProperty("--gcal-bg", this.config.backgroundColor || "#ffffff");
     wrapper.style.setProperty("--gcal-past-opacity", String(this.config.pastWeekOpacity ?? 0.45));
 
@@ -210,9 +226,11 @@ Module.register("MMM-MyGCalendar", {
     const chip = document.createElement("div");
     chip.className = "gcal-event";
 
+    const color = this.getEventColor(ev);
+
     const dot = document.createElement("span");
     dot.className = "gcal-event-dot";
-    dot.style.backgroundColor = ev.calendarColor;
+    dot.style.backgroundColor = color;
 
     const label = document.createElement("span");
     label.className = "gcal-event-label";
@@ -221,7 +239,7 @@ Module.register("MMM-MyGCalendar", {
     chip.appendChild(dot);
     chip.appendChild(label);
 
-    chip.style.setProperty("--ev-color", ev.calendarColor);
+    chip.style.setProperty("--ev-color", color);
     chip.title = ev.title;
 
     chip.addEventListener("click", (e) => {
@@ -352,7 +370,7 @@ Module.register("MMM-MyGCalendar", {
   buildDayEventItem(ev, date) {
     const item = document.createElement("div");
     item.className = "gcal-day-event-item";
-    item.style.setProperty("--ev-color", ev.calendarColor);
+    item.style.setProperty("--ev-color", this.getEventColor(ev));
 
     const colorBar = document.createElement("div");
     colorBar.className = "gcal-day-event-bar";
@@ -413,10 +431,12 @@ Module.register("MMM-MyGCalendar", {
     modal.innerHTML = "";
     modal.scrollTop = 0;
 
+    const color = this.getEventColor(ev);
+
     // ── Header ──
     const header = document.createElement("div");
     header.className = "gcal-modal-header";
-    header.style.background = `linear-gradient(135deg, ${ev.calendarColor}, ${this.shadeColor(ev.calendarColor, -20)})`;
+    header.style.background = this.colorGradient(color);
 
     const headerContent = document.createElement("div");
     headerContent.className = "gcal-modal-header-content";
@@ -479,7 +499,7 @@ Module.register("MMM-MyGCalendar", {
     calRow.className = "gcal-modal-row";
     const dot = document.createElement("span");
     dot.className = "gcal-modal-cal-dot";
-    dot.style.backgroundColor = ev.calendarColor;
+    dot.style.backgroundColor = ev.calendarColor; // always show the calendar's color here
     const calName = document.createElement("span");
     calName.className = "gcal-modal-cal-name";
     calName.textContent = ev.calendarName;
@@ -506,6 +526,23 @@ Module.register("MMM-MyGCalendar", {
     row.appendChild(icon);
     row.appendChild(span);
     return row;
+  },
+
+  // Resolves the display color for an event — per-event color takes priority over calendar color.
+  // Handles Google Calendar named colors (tomato, peacock, etc.) and hex values.
+  getEventColor(ev) {
+    const raw = ev.eventColor || ev.calendarColor;
+    if (!raw) return "#4285F4";
+    const lower = raw.toLowerCase().trim();
+    return this.GOOGLE_COLOR_MAP[lower] || raw;
+  },
+
+  // Returns a gradient background string, falling back to solid for non-hex values.
+  colorGradient(color) {
+    if (color.startsWith("#")) {
+      return `linear-gradient(135deg, ${color}, ${this.shadeColor(color, -20)})`;
+    }
+    return color;
   },
 
   shadeColor(hex, amount) {

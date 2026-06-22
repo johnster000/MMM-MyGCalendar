@@ -124,6 +124,8 @@ module.exports = NodeHelper.create({
       description: item.description ? item.description.trim() : "",
       calendarName: cal.name || "Calendar",
       calendarColor: cal.color || "#4285F4",
+      // RFC 7986 COLOR property — Google Calendar sets this per-event
+      eventColor: item.color || null,
     };
   },
 
