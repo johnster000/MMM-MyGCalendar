@@ -1,0 +1,533 @@
+/* =============================================
+   MMM-MyGCalendar
+   ============================================= */
+
+.gcal-wrapper {
+  --gcal-bg:           #ffffff;
+  --gcal-surface:      #f8f9fa;
+  --gcal-text:         #202124;
+  --gcal-text-muted:   #5f6368;
+  --gcal-border:       #e0e0e0;
+  --gcal-today-accent: #1a73e8;
+  --gcal-today-bg:     #e8f0fe;
+  --gcal-hover:        #f1f3f4;
+  --gcal-past-opacity: 0.45;
+  --gcal-radius-card:  16px;
+  --gcal-radius-chip:  4px;
+  --gcal-shadow:       0 4px 24px rgba(0,0,0,0.12), 0 1px 6px rgba(0,0,0,0.08);
+  --gcal-font:         'Roboto', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  font-family: var(--gcal-font);
+  width: 100%;
+  box-sizing: border-box;
+  color: var(--gcal-text);
+}
+
+/* ── Card shell ────────────────────────────── */
+
+.gcal-card {
+  background: var(--gcal-bg);
+  border-radius: var(--gcal-radius-card);
+  box-shadow: var(--gcal-shadow);
+  overflow: hidden;
+  width: 100%;
+}
+
+/* ── Header ────────────────────────────────── */
+
+.gcal-header {
+  background: var(--gcal-bg);
+  border-bottom: 1px solid var(--gcal-border);
+  padding: 14px 20px 12px;
+  display: flex;
+  align-items: center;
+}
+
+.gcal-month-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--gcal-text);
+  letter-spacing: -0.2px;
+}
+
+/* ── Day-of-week header row ────────────────── */
+
+.gcal-day-headers {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background: var(--gcal-surface);
+  border-bottom: 2px solid var(--gcal-border);
+}
+
+.gcal-day-header {
+  padding: 7px 0;
+  text-align: center;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--gcal-text-muted);
+  letter-spacing: 0.9px;
+  text-transform: uppercase;
+}
+
+/* ── Week rows ─────────────────────────────── */
+
+.gcal-grid {
+  display: flex;
+  flex-direction: column;
+}
+
+.gcal-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border-bottom: 1px solid var(--gcal-border);
+}
+
+.gcal-week:last-child {
+  border-bottom: none;
+}
+
+/* ── Day cells ─────────────────────────────── */
+
+.gcal-day {
+  min-height: 88px;
+  padding: 6px 7px 8px;
+  border-right: 1px solid var(--gcal-border);
+  box-sizing: border-box;
+  transition: background-color 0.12s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.gcal-day:last-child {
+  border-right: none;
+}
+
+.gcal-day:hover {
+  background-color: var(--gcal-hover);
+}
+
+.gcal-day.gcal-past {
+  opacity: var(--gcal-past-opacity);
+}
+
+.gcal-day.gcal-today {
+  background-color: var(--gcal-today-bg);
+}
+
+.gcal-day.gcal-today:hover {
+  background-color: #dce8fd;
+}
+
+/* ── Day number ────────────────────────────── */
+
+.gcal-day-num-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 4px;
+  padding: 2px 4px 2px 2px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+.gcal-day-num-wrap:hover {
+  background-color: rgba(0, 0, 0, 0.07);
+}
+
+.gcal-today .gcal-day-num-wrap:hover {
+  background-color: rgba(26, 115, 232, 0.15);
+}
+
+.gcal-day-month-tag {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--gcal-text-muted);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.gcal-day-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--gcal-text);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.gcal-today .gcal-day-number {
+  background-color: var(--gcal-today-accent);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+/* ── Event chips ───────────────────────────── */
+
+.gcal-event {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background-color: color-mix(in srgb, var(--ev-color) 12%, transparent);
+  border-left: 3px solid var(--ev-color);
+  border-radius: var(--gcal-radius-chip);
+  padding: 2px 5px 2px 4px;
+  margin-bottom: 2px;
+  cursor: pointer;
+  transition: background-color 0.12s ease, transform 0.1s ease;
+  min-width: 0;
+}
+
+.gcal-event:hover {
+  background-color: color-mix(in srgb, var(--ev-color) 22%, transparent);
+  transform: translateY(-1px);
+}
+
+.gcal-event-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.gcal-event-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--gcal-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+.gcal-more {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--gcal-text-muted);
+  padding: 1px 4px;
+  border-radius: 3px;
+  cursor: pointer;
+  margin-top: 1px;
+  transition: background-color 0.1s ease, color 0.1s ease;
+}
+
+.gcal-more:hover {
+  background-color: rgba(0, 0, 0, 0.06);
+  color: var(--gcal-text);
+}
+
+/* ── Loading state ─────────────────────────── */
+
+.gcal-loading-card {
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gcal-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 40px;
+  color: var(--gcal-text-muted);
+  font-size: 14px;
+}
+
+.gcal-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--gcal-border);
+  border-top-color: var(--gcal-today-accent);
+  border-radius: 50%;
+  animation: gcal-spin 0.8s linear infinite;
+}
+
+@keyframes gcal-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ══════════════════════════════════════════════
+   Modal — shared infrastructure
+   ══════════════════════════════════════════════ */
+
+.gcal-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.gcal-modal-backdrop.gcal-visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.gcal-modal {
+  background: #ffffff;
+  border-radius: 18px;
+  width: clamp(320px, 42vw, 520px);
+  max-width: 90vw;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow:
+    0 24px 80px rgba(0,0,0,0.3),
+    0 6px 20px rgba(0,0,0,0.15);
+  transform: translateY(20px) scale(0.97);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.gcal-modal-backdrop.gcal-visible .gcal-modal {
+  transform: translateY(0) scale(1);
+}
+
+.gcal-modal::-webkit-scrollbar { width: 5px; }
+.gcal-modal::-webkit-scrollbar-track { background: transparent; }
+.gcal-modal::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+
+/* ── Modal header ──────────────────────────── */
+
+.gcal-modal-header {
+  padding: 20px 22px 18px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+/* Day-view header uses a neutral dark gradient */
+.gcal-modal-header--day {
+  background: linear-gradient(140deg, #1c1c2e 0%, #2d2d48 100%);
+}
+
+.gcal-modal-header-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.gcal-modal-title {
+  font-size: 19px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.3;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.gcal-modal-subtitle {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.65);
+  font-weight: 400;
+}
+
+/* Button group (back + close) */
+.gcal-modal-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.gcal-modal-close,
+.gcal-modal-back {
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: rgba(255,255,255,0.9);
+  transition: background 0.15s, transform 0.12s;
+  flex-shrink: 0;
+  padding: 0;
+  line-height: 1;
+}
+
+.gcal-modal-close { font-size: 13px; }
+.gcal-modal-back  { font-size: 17px; }
+
+.gcal-modal-close:hover {
+  background: rgba(255,255,255,0.3);
+  transform: rotate(90deg);
+}
+
+.gcal-modal-back:hover {
+  background: rgba(255,255,255,0.3);
+  transform: translateX(-2px);
+}
+
+/* ── Event detail modal body ───────────────── */
+
+.gcal-modal-body {
+  padding: 16px 22px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.gcal-modal-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 13.5px;
+  color: #202124;
+  line-height: 1.5;
+}
+
+.gcal-modal-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  background-color: #5f6368;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+
+.gcal-icon-clock {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z'/%3E%3C/svg%3E");
+}
+
+.gcal-icon-pin {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z'/%3E%3C/svg%3E");
+}
+
+.gcal-icon-note {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z'/%3E%3C/svg%3E");
+}
+
+.gcal-modal-text {
+  word-break: break-word;
+}
+
+.gcal-modal-cal-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.gcal-modal-cal-name {
+  font-size: 12.5px;
+  color: #5f6368;
+  font-style: italic;
+}
+
+.gcal-modal-body > .gcal-modal-row + .gcal-modal-row {
+  border-top: 1px solid #f1f3f4;
+  padding-top: 13px;
+}
+
+/* ══════════════════════════════════════════════
+   Day-view modal body
+   ══════════════════════════════════════════════ */
+
+.gcal-day-modal-body {
+  padding: 14px 18px 20px;
+  gap: 8px;
+}
+
+.gcal-day-modal-empty {
+  padding: 28px 0;
+  text-align: center;
+  color: var(--gcal-text-muted);
+  font-size: 14px;
+  font-style: italic;
+}
+
+/* ── Day event item ─────────────────────────── */
+
+.gcal-day-event-item {
+  --ev-color: #4285F4;
+  display: flex;
+  align-items: stretch;
+  gap: 13px;
+  padding: 11px 13px;
+  border-radius: 10px;
+  cursor: pointer;
+  background: #f8f9fa;
+  border: 1px solid #eaeaea;
+  transition: background-color 0.12s ease, border-color 0.12s ease, transform 0.08s ease;
+}
+
+.gcal-day-event-item:hover {
+  background: #f0f4ff;
+  border-color: rgba(66, 133, 244, 0.25);
+  transform: translateY(-1px);
+}
+
+.gcal-day-event-bar {
+  width: 4px;
+  border-radius: 4px;
+  background: var(--ev-color);
+  flex-shrink: 0;
+  align-self: stretch;
+  min-height: 36px;
+}
+
+.gcal-day-event-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.gcal-day-event-time {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--gcal-text-muted);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.gcal-day-event-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gcal-text);
+  line-height: 1.3;
+}
+
+.gcal-day-event-loc {
+  font-size: 12px;
+  color: var(--gcal-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+.gcal-day-event-cal {
+  font-size: 11px;
+  font-weight: 500;
+  font-style: italic;
+  margin-top: 4px;
+}

@@ -1,0 +1,10 @@
+{
+  "name": "mmm-mygcalendar",
+  "version": "1.0.0",
+  "description": "Google Calendar month view for MagicMirror²",
+  "main": "MMM-MyGCalendar.js",
+  "scripts": {},
+  "dependencies": {
+    "node-ical": "^0.16.1"
+  }
+}
