@@ -114,6 +114,27 @@ module.exports = NodeHelper.create({
       item.datetype === "date" ||
       (item.start && typeof item.start.toISOString !== "function" && item.start.val);
 
+    // node-ical stores COLOR as a plain string or {val, params} object
+    let eventColor = item.color || null;
+    if (eventColor && typeof eventColor === "object") {
+      eventColor = eventColor.val || null;
+    }
+    if (eventColor) eventColor = String(eventColor).trim();
+
+    if (this.config.debug) {
+      const colorKeys = Object.keys(item).filter(k =>
+        k.toLowerCase().includes("color") || k.toLowerCase().startsWith("x-")
+      );
+      if (colorKeys.length) {
+        console.log(`[MMM-MyGCalendar] DEBUG "${item.summary}" — color-related keys:`,
+          colorKeys.reduce((acc, k) => { acc[k] = item[k]; return acc; }, {})
+        );
+      } else if (!this._debuggedKeys) {
+        this._debuggedKeys = true;
+        console.log(`[MMM-MyGCalendar] DEBUG sample event keys for "${item.summary}":`, Object.keys(item));
+      }
+    }
+
     return {
       id: `${item.uid || item.summary}_${start.getTime()}`,
       title: (item.summary || "Untitled").trim(),
@@ -124,8 +145,7 @@ module.exports = NodeHelper.create({
       description: item.description ? item.description.trim() : "",
       calendarName: cal.name || "Calendar",
       calendarColor: cal.color || "#4285F4",
-      // RFC 7986 COLOR property — Google Calendar sets this per-event
-      eventColor: item.color || null,
+      eventColor: eventColor,
     };
   },
 
