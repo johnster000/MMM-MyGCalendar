@@ -66,14 +66,35 @@ npm install
 | `calendars`          | `[]`           | Array of calendar sources (see above)                            |
 | `calendars[].name`   | `"Calendar"`   | Display name shown in modals                                     |
 | `calendars[].url`    | —              | iCal URL from Google Calendar settings                           |
-| `calendars[].color`  | `"#4285F4"`    | Hex color for event chips and modal header                       |
+| `calendars[].color`  | `"#4285F4"`    | Fallback hex color used when the event has no individual color   |
 | `updateInterval`     | `900000` (15m) | How often to re-fetch calendar data (ms)                         |
 | `weekStartsOnMonday` | `false`        | Set `true` for Mon–Sun week layout                               |
 | `backgroundColor`    | `"#ffffff"`    | Background color of the calendar card                            |
 | `pastWeekOpacity`    | `0.45`         | Opacity of the past-week row (0 = invisible, 1 = full)           |
 | `maxEventsPerDay`    | `3`            | Max chips shown per day cell (overflow shown as clickable "+N more") |
+| `fullWidth`          | `false`        | Set `true` to remove border-radius and shadow for a flush edge-to-edge look |
 
-### Suggested calendar colors
+### Per-event colors from Google Calendar
+
+Individual event colors set inside Google Calendar are picked up automatically — no extra config needed. When you assign a color to a specific event in Google Calendar (right-click → color dot), that color is exported in the iCal feed via the RFC 7986 `COLOR` property and will override the calendar's fallback color on that event's chip and modal header.
+
+All of Google's built-in event color names are supported:
+
+| Google name  | Hex       |
+|--------------|-----------|
+| Tomato       | `#D50000` |
+| Flamingo     | `#E67C73` |
+| Tangerine    | `#F4511E` |
+| Banana       | `#F6BF26` |
+| Sage         | `#33B679` |
+| Basil        | `#0B8043` |
+| Peacock      | `#039BE5` |
+| Blueberry    | `#3F51B5` |
+| Lavender     | `#7986CB` |
+| Grape        | `#8E24AA` |
+| Graphite     | `#616161` |
+
+### Suggested fallback calendar colors
 
 | Color        | Hex       |
 |--------------|-----------|
