@@ -8,6 +8,7 @@ Module.register("MMM-MyGCalendar", {
     maxEventsPerDay: 3,
     fullWidth: false,
     debug: false,
+    colorRules: [],
   },
 
   // Maps Google Calendar color values → hex.
@@ -543,13 +544,29 @@ Module.register("MMM-MyGCalendar", {
     return row;
   },
 
-  // Resolves the display color for an event — per-event color takes priority over calendar color.
-  // Handles Google Calendar named colors (tomato, peacock, etc.) and hex values.
+  // Resolves the display color for an event.
+  // Priority: iCal COLOR property → colorRules keyword match → calendar fallback color.
   getEventColor(ev) {
-    const raw = ev.eventColor || ev.calendarColor;
-    if (!raw) return "#4285F4";
-    const lower = raw.toLowerCase().trim();
-    return this.GOOGLE_COLOR_MAP[lower] || raw;
+    // 1. Per-event color from iCal (works for non-Google sources; Google iCal doesn't export this)
+    if (ev.eventColor) {
+      const lower = ev.eventColor.toLowerCase().trim();
+      return this.GOOGLE_COLOR_MAP[lower] || ev.eventColor;
+    }
+
+    // 2. Title-based color rules from config
+    const rules = this.config.colorRules;
+    if (rules && rules.length) {
+      for (const rule of rules) {
+        if (!rule.keyword || !rule.color) continue;
+        const pattern = rule.keyword instanceof RegExp
+          ? rule.keyword
+          : new RegExp(rule.keyword, "i");
+        if (pattern.test(ev.title)) return rule.color;
+      }
+    }
+
+    // 3. Calendar fallback color
+    return ev.calendarColor || "#4285F4";
   },
 
   // Returns a gradient background string, falling back to solid for non-hex values.

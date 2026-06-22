@@ -73,12 +73,33 @@ npm install
 | `pastWeekOpacity`    | `0.45`         | Opacity of the past-week row (0 = invisible, 1 = full)           |
 | `maxEventsPerDay`    | `3`            | Max chips shown per day cell (overflow shown as clickable "+N more") |
 | `fullWidth`          | `false`        | Set `true` to remove border-radius and shadow for a flush edge-to-edge look |
+| `colorRules`         | `[]`           | Keyword-based color overrides — see below                        |
+| `debug`              | `false`        | Log raw event properties to the MagicMirror console (useful for troubleshooting) |
 
-### Per-event colors from Google Calendar
+### Per-event colors with `colorRules`
 
-Individual event colors set inside Google Calendar are picked up automatically — no extra config needed. When you assign a color to a specific event in Google Calendar (right-click → color dot), that color is exported in the iCal feed via the RFC 7986 `COLOR` property and will override the calendar's fallback color on that event's chip and modal header.
+Google Calendar's iCal export does not include individual event colors — those only exist in the Google Calendar API (which requires OAuth). The iCal feed only carries the calendar-level color set in `calendars[].color`.
 
-All of Google's built-in event color names are supported:
+To color specific events, use `colorRules`. Each rule matches against the event title (case-insensitive) and applies a hex color. Rules are checked in order — the first match wins.
+
+```javascript
+config: {
+  colorRules: [
+    { keyword: "standup",    color: "#039BE5" }, // Peacock blue
+    { keyword: "birthday",   color: "#E91E63" }, // Pink
+    { keyword: "gym|workout",color: "#F4511E" }, // Tangerine — regex OR
+    { keyword: "holiday",    color: "#0B8043" }, // Basil green
+    { keyword: "flight|travel", color: "#F6BF26" }, // Banana yellow
+  ],
+  calendars: [...]
+}
+```
+
+The `keyword` value is treated as a **case-insensitive regular expression**, so you can use `|` for OR, `^` to match the start, etc.
+
+Color priority order: iCal `COLOR` property (non-Google sources) → `colorRules` match → `calendars[].color` fallback.
+
+### Suggested colors
 
 | Google name  | Hex       |
 |--------------|-----------|
