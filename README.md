@@ -4,6 +4,8 @@ A polished month-view calendar module for [MagicMirror²](https://magicmirror.bu
 
 Displays a rolling 4-week window: **1 past week · current week · 2 future weeks**.
 
+![MMM-MyGCalendar screenshot](screenshot.png)
+
 - Click any **event chip** → full event detail modal
 - Click any **date number** → day-view modal listing all events for that day (click any event there for full detail with a ← back button)
 - Click **"+N more"** → same day-view modal
