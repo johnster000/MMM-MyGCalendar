@@ -1,9 +1,14 @@
 {
-  "name": "mmm-mygcalendar",
+  "name": "MMM-MyGCalendar",
   "version": "1.0.0",
-  "description": "Google Calendar month view for MagicMirror²",
+  "description": "MagicMirror² module — polished month-view Google Calendar with event modals and color rules",
   "main": "MMM-MyGCalendar.js",
-  "scripts": {},
+  "keywords": ["MagicMirror", "module", "calendar", "Google", "Google Calendar", "iCal", "month-view"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/johnster000/MMM-MyGCalendar.git"
+  },
   "dependencies": {
     "node-ical": "^0.16.1"
   }

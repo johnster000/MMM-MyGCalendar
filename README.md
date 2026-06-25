@@ -23,6 +23,16 @@ npm install
 
 ---
 
+## Update
+
+```bash
+cd ~/MagicMirror/modules/MMM-MyGCalendar
+git pull
+npm install
+```
+
+---
+
 ## Getting Your Google Calendar iCal URL
 
 1. Open [Google Calendar](https://calendar.google.com) in a browser.
@@ -65,7 +75,7 @@ npm install
       { keyword: "flight|travel",  color: "#F6BF26" }, // Banana
     ]
   }
-}
+},
 ```
 
 ### All Options
