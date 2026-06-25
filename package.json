@@ -10,6 +10,6 @@
     "url": "https://github.com/johnster000/MMM-MyGCalendar.git"
   },
   "dependencies": {
-    "node-ical": "^0.16.1"
+    "node-ical": "^0.26.1"
   }
 }
