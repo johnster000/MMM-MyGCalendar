@@ -1,6 +1,6 @@
 {
   "name": "MMM-MyGCalendar",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "MagicMirror² module — polished month-view Google Calendar with event modals and color rules",
   "main": "MMM-MyGCalendar.js",
   "keywords": ["MagicMirror", "module", "calendar", "Google", "Google Calendar", "iCal", "month-view"],

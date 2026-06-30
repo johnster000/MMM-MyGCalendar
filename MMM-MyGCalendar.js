@@ -7,6 +7,7 @@ Module.register("MMM-MyGCalendar", {
     pastWeekOpacity: 0.45,
     maxEventsPerDay: 3,
     fullWidth: false,
+    showHeader: true,
     debug: false,
     colorRules: [],
   },
@@ -108,6 +109,7 @@ Module.register("MMM-MyGCalendar", {
     wrapper.className = "gcal-wrapper" + (this.config.fullWidth ? " gcal-full-width" : "");
     wrapper.style.setProperty("--gcal-bg", this.config.backgroundColor || "#ffffff");
     wrapper.style.setProperty("--gcal-past-opacity", String(this.config.pastWeekOpacity ?? 0.45));
+    wrapper.style.setProperty("--gcal-max-events", String(this.config.maxEventsPerDay ?? 3));
 
     if (!this.loaded) {
       const card = document.createElement("div");
@@ -120,7 +122,9 @@ Module.register("MMM-MyGCalendar", {
     const card = document.createElement("div");
     card.className = "gcal-card";
 
-    card.appendChild(this.buildHeader(displayStart));
+    if (this.config.showHeader !== false) {
+      card.appendChild(this.buildHeader(displayStart));
+    }
     card.appendChild(this.buildDayHeaders());
     card.appendChild(this.buildGrid());
 
@@ -197,6 +201,9 @@ Module.register("MMM-MyGCalendar", {
     if (isPast) cls += " gcal-past";
     cell.className = cls;
 
+    const topRow = document.createElement("div");
+    topRow.className = "gcal-day-top-row";
+
     const numWrap = document.createElement("div");
     numWrap.className = "gcal-day-num-wrap";
 
@@ -218,26 +225,33 @@ Module.register("MMM-MyGCalendar", {
       this.showDayModal(new Date(date));
     });
 
-    cell.appendChild(numWrap);
+    topRow.appendChild(numWrap);
 
     const eventsForDay = this.getEventsForDay(date);
     const max = this.config.maxEventsPerDay ?? 3;
 
-    eventsForDay.slice(0, max).forEach((ev) => {
-      cell.appendChild(this.buildEventChip(ev));
-    });
-
     if (eventsForDay.length > max) {
-      const more = document.createElement("div");
-      more.className = "gcal-more";
-      more.textContent = `+${eventsForDay.length - max} more`;
-      // Clicking "+N more" also opens the day modal
-      more.addEventListener("click", (e) => {
+      const badge = document.createElement("div");
+      badge.className = "gcal-day-more-badge";
+      badge.textContent = `+${eventsForDay.length - max}`;
+      // Clicking the overflow badge also opens the day modal
+      badge.addEventListener("click", (e) => {
         e.stopPropagation();
         this.showDayModal(new Date(date));
       });
-      cell.appendChild(more);
+      topRow.appendChild(badge);
     }
+
+    cell.appendChild(topRow);
+
+    const eventsWrap = document.createElement("div");
+    eventsWrap.className = "gcal-day-events";
+
+    eventsForDay.slice(0, max).forEach((ev) => {
+      eventsWrap.appendChild(this.buildEventChip(ev));
+    });
+
+    cell.appendChild(eventsWrap);
 
     return cell;
   },

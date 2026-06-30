@@ -8,7 +8,8 @@ Displays a rolling 4-week window: **1 past week · current week · 2 future week
 
 - Click any **event chip** → full event detail modal
 - Click any **date number** → day-view modal listing all events for that day (click any event there for full detail with a ← back button)
-- Click **"+N more"** → same day-view modal
+- Click the **"+N" badge** (top-right corner of a date square) → same day-view modal
+- Every date square reserves a fixed height for `maxEventsPerDay` events, so the calendar's overall height stays predictable regardless of how many events land on a given day
 
 ---
 
@@ -90,8 +91,9 @@ npm install
 | `weekStartsOnMonday` | `false`        | Set `true` for Mon–Sun week layout                               |
 | `backgroundColor`    | `"#ffffff"`    | Background color of the calendar card                            |
 | `pastWeekOpacity`    | `0.45`         | Opacity of the past-week row (0 = invisible, 1 = full)           |
-| `maxEventsPerDay`    | `3`            | Max chips shown per day cell (overflow shown as clickable "+N more") |
+| `maxEventsPerDay`    | `3`            | Max chips shown per day cell (also sets the fixed slot height of every date square; overflow shown as a clickable "+N" corner badge) |
 | `fullWidth`          | `false`        | Set `true` to remove border-radius and shadow for a flush edge-to-edge look |
+| `showHeader`         | `true`         | Set `false` to hide the month-range header bar above the calendar grid |
 | `colorRules`         | `[]`           | Keyword-based color overrides — see below                        |
 | `debug`              | `false`        | Log raw event properties to the MagicMirror console (useful for troubleshooting) |
 
@@ -154,6 +156,6 @@ Color priority order: iCal `COLOR` property (non-Google sources) → `colorRules
 |---------------------|-----------------------------------------------------|
 | Event chip          | Event detail modal (title, time, location, notes)   |
 | Date number         | Day-view modal — all events for that day            |
-| "+N more" label     | Day-view modal — all events for that day            |
+| "+N" corner badge   | Day-view modal — all events for that day            |
 | Event in day modal  | Event detail modal with ← back to day view          |
 | Backdrop / Esc      | Close modal                                         |
