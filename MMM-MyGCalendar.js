@@ -178,15 +178,33 @@ Module.register("MMM-MyGCalendar", {
       const row = document.createElement("div");
       row.className = "gcal-week";
 
+      const weekDates = [];
       for (let d = 0; d < 7; d++) {
         const date = new Date(displayStart);
         date.setDate(displayStart.getDate() + w * 7 + d);
+        weekDates.push(date);
+      }
 
+      // Multi-day (all-day) events get a lane reserved across every day they
+      // touch in this row, so they render as one connected bar instead of
+      // separate chips. Only connects within a single week row.
+      const rowSpans = this.getRowSpanInfo(weekDates);
+      const excluded = new Set(rowSpans.map((r) => r.ev));
+
+      weekDates.forEach((date, d) => {
         const isToday = date.toDateString() === today.toDateString();
         const isPast = date < currentWeekStart;
 
-        row.appendChild(this.buildDay(date, isToday, isPast));
-      }
+        const max = this.config.maxEventsPerDay ?? 3;
+        const spanSlots = new Array(max).fill(null);
+        rowSpans.forEach((r) => {
+          if (d >= r.startCol && d <= r.endCol) {
+            spanSlots[r.lane] = { ev: r.ev, isStart: d === r.startCol, isEnd: d === r.endCol };
+          }
+        });
+
+        row.appendChild(this.buildDay(date, isToday, isPast, spanSlots, excluded));
+      });
 
       grid.appendChild(row);
     }
@@ -194,7 +212,66 @@ Module.register("MMM-MyGCalendar", {
     return grid;
   },
 
-  buildDay(date, isToday, isPast) {
+  // Assigns each multi-day all-day event touching this row to a lane (0-based),
+  // greedily packing non-overlapping events into the same lane. Events that
+  // don't fit within maxEventsPerDay lanes are left unplaced and fall back to
+  // normal per-day chip rendering.
+  getRowSpanInfo(weekDates) {
+    const max = this.config.maxEventsPerDay ?? 3;
+    const rowStart = new Date(weekDates[0]);
+    rowStart.setHours(0, 0, 0, 0);
+    const rowEnd = new Date(weekDates[6]);
+    rowEnd.setHours(0, 0, 0, 0);
+    rowEnd.setDate(rowEnd.getDate() + 1);
+
+    const dayMs = 24 * 60 * 60 * 1000;
+    const candidates = [];
+
+    this.events.forEach((ev) => {
+      if (!ev.allDay) return;
+
+      const s = new Date(ev.start);
+      s.setHours(0, 0, 0, 0);
+      const e = new Date(ev.end);
+      e.setHours(0, 0, 0, 0);
+
+      if (e - s <= dayMs) return; // single-day event
+      if (s >= rowEnd || e <= rowStart) return; // doesn't touch this row
+
+      const effStart = s < rowStart ? rowStart : s;
+      const effEnd = e > rowEnd ? rowEnd : e;
+
+      const startCol = Math.round((effStart - rowStart) / dayMs);
+      const endCol = Math.round((effEnd - rowStart) / dayMs) - 1;
+
+      if (endCol - startCol < 1) return; // clipped to a single day in this row
+
+      candidates.push({ ev, startCol, endCol });
+    });
+
+    candidates.sort((a, b) => a.startCol - b.startCol || (b.endCol - b.startCol) - (a.endCol - a.startCol));
+
+    const lanes = [];
+    const placed = [];
+
+    candidates.forEach((c) => {
+      let lane = 0;
+      while (lane < max) {
+        const conflicts = (lanes[lane] || []).some((iv) => c.startCol <= iv.endCol && c.endCol >= iv.startCol);
+        if (!conflicts) break;
+        lane++;
+      }
+      if (lane >= max) return; // no free lane — falls back to a normal chip
+
+      lanes[lane] = lanes[lane] || [];
+      lanes[lane].push({ startCol: c.startCol, endCol: c.endCol });
+      placed.push({ ev: c.ev, startCol: c.startCol, endCol: c.endCol, lane });
+    });
+
+    return placed;
+  },
+
+  buildDay(date, isToday, isPast, spanSlots, excludedSpanEvents) {
     const cell = document.createElement("div");
     let cls = "gcal-day";
     if (isToday) cls += " gcal-today";
@@ -247,8 +324,25 @@ Module.register("MMM-MyGCalendar", {
     const eventsWrap = document.createElement("div");
     eventsWrap.className = "gcal-day-events";
 
-    eventsForDay.slice(0, max).forEach((ev) => {
-      eventsWrap.appendChild(this.buildEventChip(ev));
+    const slots = spanSlots ? spanSlots.slice() : new Array(max).fill(null);
+    const singleEvents = eventsForDay.filter((ev) => !excludedSpanEvents || !excludedSpanEvents.has(ev));
+
+    let si = 0;
+    for (let i = 0; i < slots.length; i++) {
+      if (slots[i]) continue;
+      if (si < singleEvents.length) {
+        slots[i] = { single: singleEvents[si] };
+        si++;
+      }
+    }
+
+    slots.forEach((slot) => {
+      if (!slot) return;
+      if (slot.single) {
+        eventsWrap.appendChild(this.buildEventChip(slot.single));
+      } else {
+        eventsWrap.appendChild(this.buildSpanChip(slot.ev, slot.isStart, slot.isEnd));
+      }
     });
 
     cell.appendChild(eventsWrap);
@@ -275,6 +369,34 @@ Module.register("MMM-MyGCalendar", {
 
     chip.style.setProperty("--ev-color", color);
     chip.title = ev.title;
+
+    chip.addEventListener("click", (e) => {
+      e.stopPropagation();
+      this.showModal(ev, null);
+    });
+
+    return chip;
+  },
+
+  // Renders one day's segment of a multi-day all-day event as a connected bar.
+  // Only the first day's segment (isStart) shows the title; the rest continue
+  // the color across the row with no rounded corners on the joining side(s).
+  buildSpanChip(ev, isStart, isEnd) {
+    const chip = document.createElement("div");
+    chip.className = "gcal-event gcal-event-span";
+    if (isStart) chip.classList.add("gcal-event-span--start");
+    if (isEnd) chip.classList.add("gcal-event-span--end");
+
+    const color = this.getEventColor(ev);
+    chip.style.setProperty("--ev-color", color);
+    chip.title = ev.title;
+
+    if (isStart) {
+      const label = document.createElement("span");
+      label.className = "gcal-event-label";
+      label.textContent = ev.title;
+      chip.appendChild(label);
+    }
 
     chip.addEventListener("click", (e) => {
       e.stopPropagation();

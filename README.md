@@ -10,6 +10,7 @@ Displays a rolling 4-week window: **1 past week · current week · 2 future week
 - Click any **date number** → day-view modal listing all events for that day (click any event there for full detail with a ← back button)
 - Click the **"+N" badge** (top-right corner of a date square) → same day-view modal
 - Every date square reserves a fixed height for `maxEventsPerDay` events, so the calendar's overall height stays predictable regardless of how many events land on a given day
+- Multi-day all-day events (e.g. "Vacation", "Conference") render as a single connected bar across the days they cover, as long as those days are in the same calendar row — the bar breaks and restarts at the end of a week
 
 ---
 
